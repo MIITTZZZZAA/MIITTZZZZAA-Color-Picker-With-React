@@ -1,4 +1,86 @@
 import React, { useRef, useState } from "react";
+import namer from "color-namer";
+
+const colorList = [
+  { name: "Black", r: 0, g: 0, b: 0 },
+  { name: "White", r: 255, g: 255, b: 255 },
+  { name: "Gray", r: 128, g: 128, b: 128 },
+  { name: "Dark Gray", r: 64, g: 64, b: 64 },
+  { name: "Light Gray", r: 211, g: 211, b: 211 },
+  { name: "Gainsboro", r: 220, g: 220, b: 220 },
+  { name: "Dim Gray", r: 105, g: 105, b: 105 },
+  { name: "Slate Gray", r: 112, g: 128, b: 144 },
+
+  { name: "Red", r: 255, g: 0, b: 0 },
+  { name: "Dark Red", r: 139, g: 0, b: 0 },
+  { name: "Firebrick", r: 178, g: 34, b: 34 },
+  { name: "Crimson", r: 220, g: 20, b: 60 },
+  { name: "Indian Red", r: 205, g: 92, b: 92 },
+  { name: "Light Coral", r: 240, g: 128, b: 128 },
+
+  { name: "Orange", r: 255, g: 165, b: 0 },
+  { name: "Dark Orange", r: 255, g: 140, b: 0 },
+  { name: "Coral", r: 255, g: 127, b: 80 },
+  { name: "Tomato", r: 255, g: 99, b: 71 },
+  { name: "Salmon", r: 250, g: 128, b: 114 },
+  { name: "Light Salmon", r: 255, g: 160, b: 122 },
+
+  { name: "Yellow", r: 255, g: 255, b: 0 },
+  { name: "Gold", r: 255, g: 215, b: 0 },
+  { name: "Khaki", r: 240, g: 230, b: 140 },
+  { name: "Light Yellow", r: 255, g: 255, b: 224 },
+  { name: "Lemon Chiffon", r: 255, g: 250, b: 205 },
+
+  { name: "Green", r: 0, g: 128, b: 0 },
+  { name: "Dark Green", r: 0, g: 100, b: 0 },
+  { name: "Forest Green", r: 34, g: 139, b: 34 },
+  { name: "Sea Green", r: 46, g: 139, b: 87 },
+  { name: "Lime", r: 0, g: 255, b: 0 },
+  { name: "Light Green", r: 144, g: 238, b: 144 },
+  { name: "Pale Green", r: 152, g: 251, b: 152 },
+
+  { name: "Cyan", r: 0, g: 255, b: 255 },
+  { name: "Teal", r: 0, g: 128, b: 128 },
+  { name: "Turquoise", r: 64, g: 224, b: 208 },
+  { name: "Medium Turquoise", r: 72, g: 209, b: 204 },
+  { name: "Dark Turquoise", r: 0, g: 206, b: 209 },
+
+  { name: "Blue", r: 0, g: 0, b: 255 },
+  { name: "Dark Blue", r: 0, g: 0, b: 139 },
+  { name: "Navy", r: 0, g: 0, b: 128 },
+  { name: "Royal Blue", r: 65, g: 105, b: 225 },
+  { name: "Sky Blue", r: 135, g: 206, b: 235 },
+  { name: "Light Blue", r: 173, g: 216, b: 230 },
+  { name: "Dodger Blue", r: 30, g: 144, b: 255 },
+
+  { name: "Purple", r: 128, g: 0, b: 128 },
+  { name: "Dark Violet", r: 148, g: 0, b: 211 },
+  { name: "Blue Violet", r: 138, g: 43, b: 226 },
+  { name: "Violet", r: 238, g: 130, b: 238 },
+  { name: "Orchid", r: 218, g: 112, b: 214 },
+  { name: "Plum", r: 221, g: 160, b: 221 },
+  { name: "Lavender", r: 230, g: 230, b: 250 },
+
+  { name: "Pink", r: 255, g: 192, b: 203 },
+  { name: "Light Pink", r: 255, g: 182, b: 193 },
+  { name: "Hot Pink", r: 255, g: 105, b: 180 },
+  { name: "Deep Pink", r: 255, g: 20, b: 147 },
+  { name: "Pale Violet Red", r: 219, g: 112, b: 147 },
+
+  { name: "Brown", r: 165, g: 42, b: 42 },
+  { name: "Saddle Brown", r: 139, g: 69, b: 19 },
+  { name: "Sienna", r: 160, g: 82, b: 45 },
+  { name: "Peru", r: 205, g: 133, b: 63 },
+  { name: "Chocolate", r: 210, g: 105, b: 30 },
+  { name: "Tan", r: 210, g: 180, b: 140 },
+  { name: "Burlywood", r: 222, g: 184, b: 135 },
+
+  { name: "Ivory", r: 255, g: 255, b: 240 },
+  { name: "Beige", r: 245, g: 245, b: 220 },
+  { name: "Snow", r: 255, g: 250, b: 250 },
+  { name: "Mint Cream", r: 245, g: 255, b: 250 },
+  { name: "Floral White", r: 255, g: 250, b: 240 },
+];
 
 function App() {
   const [imageSrc, setImageSrc] = useState(null);
@@ -32,7 +114,9 @@ function App() {
     const hex = `#${[pixel[0], pixel[1], pixel[2]]
       .map((c) => c.toString(16).padStart(2, "0"))
       .join("")}`;
-    setColor({ rgb, hex, x, y });
+    const libName = namer(hex).ntc[0].name;
+
+    setColor({ rgb, hex, x, y, name: getClosestColorName(hex), libName });
 
     const zoomCanvas = zoomCanvasRef.current;
     const zoomCtx = zoomCanvas.getContext("2d");
@@ -113,6 +197,29 @@ function App() {
     ctx.drawImage(img, 0, 0);
   };
 
+  function getClosestColorName(hex) {
+    const r1 = parseInt(hex.substr(1, 2), 16);
+    const g1 = parseInt(hex.substr(3, 2), 16);
+    const b1 = parseInt(hex.substr(5, 2), 16);
+
+    let closest = null;
+    let minDistance = Infinity;
+
+    for (const c of colorList) {
+      const dr = c.r - r1;
+      const dg = c.g - g1;
+      const db = c.b - b1;
+      const dist = dr * dr + dg * dg + db * db;
+
+      if (dist < minDistance) {
+        minDistance = dist;
+        closest = c.name;
+      }
+    }
+
+    return closest;
+  }
+
   return (
     <>
       <div className="min-h-screen bg-gray-100 p-1 flex flex-col items-center">
@@ -163,6 +270,16 @@ function App() {
                   </p>
                   <p className="text-gray-700">
                     HEX: <span className="font-semibold">{color.hex}</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-700">
+                    Color Aproximation 1:{" "}
+                    <span className="font-semibold">{color.name}</span>
+                  </p>
+                  <p className="text-gray-700">
+                    Color Aproximation 2:{" "}
+                    <span className="font-semibold">{color.libName}</span>
                   </p>
                 </div>
                 <div

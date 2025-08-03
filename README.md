@@ -1,70 +1,85 @@
-# Getting Started with Create React App
+# Image Color Picker
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a React-based web application that allows users to upload an image and inspect the color of any pixel in that image. The application provides a real-time zoomed view of the area around the cursor and displays detailed color information including RGB, HEX, and name approximations.
 
-## Available Scripts
+![Example 1](GitMedia/Eg1.jpg)
+![Example 2](GitMedia/Eg2.jpg)
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Image Uploading**: Upload any image from your local device.
+- **Pixel Color Inspection**: Hover over the image to get color details of the specific pixel under the cursor.
+- **Zoomed-In View**: A magnified preview (zoom lens) of the hovered area is shown for more precise color picking.
+- **Color Naming**: Displays two approximations for the color name:
+  - A custom Euclidean distance matcher from a curated color list.
+  - A name derived from the `color-namer` library.
+- **Interaction Modes**:
+  - `wrap` mode: Zoom stays fixed to the left of the canvas.
+  - `overlay` mode: Zoom follows the cursor directly over the image.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## How It Works
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Image Rendering
 
-### `npm run build`
+When a user uploads an image:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- It is displayed using an invisible `<img>` element (`imgRef`).
+- The image is then drawn on a `<canvas>` (`canvasRef`) using the `drawImageOnCanvas()` function.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Mouse Movement Detection
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+When the mouse moves over the canvas:
 
-### `npm run eject`
+1. The cursor's position relative to the canvas is calculated, factoring in scaling.
+2. The image pixel data at that position is extracted using `getImageData()`.
+3. RGB and HEX values are computed from the pixel data.
+4. Two approximated color names are calculated:
+   - `getClosestColorName()`: Matches the closest color from a large predefined list using Euclidean distance in RGB space.
+   - `color-namer`: Uses a third-party library to match the color name from a standard palette.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Zoomed Canvas
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+A second canvas (`zoomCanvasRef`) acts as a zoom lens:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- A small area (e.g., 12x12 pixels) around the cursor is extracted.
+- This area is rendered at a much larger scale for clarity.
+- A red crosshair is drawn at the center in `wrap` mode to indicate the focused pixel.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+In `overlay` mode:
 
-## Learn More
+- The zoom canvas follows the mouse.
+- It is positioned exactly over the image and moves with the cursor.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Technologies Used
 
-### Code Splitting
+- **React**: For building the interactive UI.
+- **HTML5 Canvas**: For rendering the image and accessing pixel-level data.
+- **Tailwind CSS**: For styling the UI quickly and responsively.
+- **color-namer**: A library that approximates human-friendly color names.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## File Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+- `App.js`: Main application file containing all core logic and UI.
+- `colorList`: A large predefined list of known RGB values with names for custom color matching.
+- `README.md`: Project documentation (this file).
 
-### Making a Progressive Web App
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Usage
 
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+1. Launch the app in your browser.
+2. Click “Choose file” to upload an image.
+3. Hover over the image to view:
+   - RGB values
+   - HEX code
+   - Closest color name
+   - Zoomed view of the area
+4. Switch between `wrap` and `overlay` modes to change zoom behavior.
